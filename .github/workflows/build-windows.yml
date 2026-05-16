@@ -1,0 +1,33 @@
+name: Build Windows Standalone
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: install frontend dependencies
+        run: npm install
+
+      - name: build Tauri app
+        run: npx tauri build --bundles none
+
+      - name: upload standalone exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: tat-windows-standalone
+          path: src-tauri/target/release/tat.exe
